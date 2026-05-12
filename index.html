@@ -47,10 +47,6 @@
       mask-image:linear-gradient(to bottom, black, transparent 82%);
     }
 
-    body[dir="rtl"]{
-      font-family:Tahoma, Arial, sans-serif;
-    }
-
     a{text-decoration:none;color:inherit}
 
     .wrap{
@@ -106,10 +102,9 @@
       gap:8px;
       flex-wrap:wrap;
       justify-content:flex-end;
-      align-items:center;
     }
 
-    .nav a,.smallBtn,.langBtn{
+    .nav a,.smallBtn{
       padding:10px 13px;
       border-radius:999px;
       background:rgba(255,255,255,.08);
@@ -118,12 +113,6 @@
       font-weight:800;
       font-size:14px;
       cursor:pointer;
-    }
-
-    .langBtn{
-      background:linear-gradient(135deg,rgba(255,209,102,.22),rgba(54,209,220,.12));
-      color:#fff6da;
-      min-width:100px;
     }
 
     .hero{
@@ -153,11 +142,6 @@
       font-size:clamp(44px,8vw,86px);
       line-height:.92;
       letter-spacing:-2px;
-    }
-
-    body[dir="rtl"] h1{
-      letter-spacing:0;
-      line-height:1.05;
     }
 
     .grad{
@@ -194,7 +178,6 @@
       transition:.15s transform,.15s filter;
       display:inline-flex;
       align-items:center;
-      justify-content:center;
       gap:9px;
     }
     .btn:hover{transform:translateY(-2px);filter:brightness(1.04)}
@@ -228,8 +211,6 @@
       box-shadow:inset 0 2px 8px rgba(255,255,255,.15), 0 24px 55px rgba(0,0,0,.42);
       transform:rotate(-2deg);
     }
-
-    body[dir="rtl"] .machine{transform:rotate(2deg)}
 
     .screen{
       position:absolute;
@@ -401,7 +382,7 @@
       gap:8px;
       margin-top:4px;
     }
-    .playRow .btn{width:100%;padding:12px 14px;border-radius:15px}
+    .playRow .btn{width:100%;justify-content:center;padding:12px 14px;border-radius:15px}
 
     .coming{
       opacity:.72;
@@ -439,41 +420,83 @@
       .sectionHead{align-items:start;flex-direction:column}
     }
   </style>
+
+<style>
+.gameOverlay{
+  position:fixed;
+  inset:0;
+  z-index:9999;
+  background:rgba(3,6,18,.96);
+  display:none;
+  flex-direction:column;
+}
+.gameOverlayTop{
+  height:58px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding:10px 16px;
+  background:rgba(255,255,255,.08);
+  border-bottom:1px solid rgba(255,255,255,.13);
+  color:white;
+  font-family:Tahoma, Arial, sans-serif;
+}
+.gameOverlayTitle{
+  font-weight:900;
+  font-size:18px;
+}
+.closeGameBtn{
+  border:0;
+  border-radius:12px;
+  padding:10px 14px;
+  font-weight:900;
+  cursor:pointer;
+  background:linear-gradient(135deg,#fff,#ffd166);
+  color:#08111e;
+}
+#gameFrame{
+  width:100%;
+  height:calc(100vh - 58px);
+  border:0;
+  background:#070914;
+}
+</style>
+
 </head>
 <body>
   <div class="wrap">
     <header>
       <a class="brand" href="#">
         <span class="logo">KK</span>
-        <span data-i18n="brand">KKGame</span>
+        <span>KKGame</span>
       </a>
       <nav class="nav">
-        <a href="#games" data-i18n="navGames">Games</a>
-        <a href="#today" data-i18n="navToday">Game of the Day</a>
-        <a href="#about" data-i18n="navAbout">About</a>
-        <button class="langBtn" id="langBtn" onclick="toggleLanguage()">العربية</button>
+        <a href="#games">Games</a>
+        <a href="#today">Game of the Day</a>
+        <a href="#about">About</a>
       </nav>
     </header>
 
     <main>
       <section class="hero">
         <div>
-          <div class="badge" data-i18n="badge">🎮 School Arcade Project</div>
-          <h1><span data-i18n="heroLine1">Play smart.</span><br><span class="grad" data-i18n="heroLine2">Learn faster.</span></h1>
-          <p class="lead" data-i18n="lead">
+          <div class="badge">🎮 School Arcade Project</div>
+          <h1>Play smart.<br><span class="grad">Learn faster.</span></h1>
+          <p class="lead">
             Welcome to KKGame — a simple school-friendly arcade where new HTML games can be added every day for students to play, test, and enjoy.
           </p>
           <div class="heroActions">
-            <a class="btn" href="#games" data-i18n="explore">Explore Games</a>
-            <a class="btn alt" href="domino_duel_english_real_tiles.html" data-i18n="playDomino">Play Domino Duel</a>
+            <a class="btn" href="#games">Explore Games</a>
+            <a class="btn alt" href="#" onclick="openGame('domino.html'); return false;">Play Domino Duel</a>
           </div>
         </div>
 
         <div class="arcadeCard">
           <div class="machine">
             <div class="screen">
-              <span data-i18n="screen1">KKGame</span><br>
-              <span data-i18n="screen2">Daily Challenge</span>
+              KKGame<br>
+              Daily Challenge
             </div>
             <div class="controlsArt">
               <div class="joy"></div>
@@ -485,10 +508,10 @@
 
       <section id="today" class="sectionHead">
         <div>
-          <h2 data-i18n="todayTitle">Game of the Day</h2>
-          <p data-i18n="todayDesc">Start with today’s featured classroom game.</p>
+          <h2>Game of the Day</h2>
+          <p>Start with today’s featured classroom game.</p>
         </div>
-        <button class="smallBtn" onclick="location.href='domino_duel_english_real_tiles.html'" data-i18n="playNow">Play now</button>
+        <button class="smallBtn" onclick="openGame('domino.html')">Play now</button>
       </section>
 
       <section id="games" class="games">
@@ -496,18 +519,18 @@
           <div class="cover domino"></div>
           <div class="gameBody">
             <div class="gameTitle">
-              <h3 data-i18n="dominoTitle">Domino Duel</h3>
-              <span class="tag" data-i18n="live">Live</span>
+              <h3>Domino Duel</h3>
+              <span class="tag">Live</span>
             </div>
-            <p class="desc" data-i18n="dominoDesc">A polished domino game against the computer. Match tiles, draw from the boneyard, and win with strategy.</p>
+            <p class="desc">A polished domino game against the computer. Match tiles, draw from the boneyard, and win with strategy.</p>
             <div class="meta">
-              <span data-i18n="strategy">🎲 Strategy</span>
-              <span data-i18n="fiveMin">⏱ 5 min</span>
-              <span data-i18n="medium">⭐ Medium</span>
-              <span data-i18n="single">👤 Single Player</span>
+              <span>🎲 Strategy</span>
+              <span>⏱ 5 min</span>
+              <span>⭐ Medium</span>
+              <span>👤 Single Player</span>
             </div>
             <div class="playRow">
-              <a class="btn" href="domino_duel_english_real_tiles.html" data-i18n="playGame">Play Game</a>
+              <a class="btn" href="#" onclick="openGame('domino.html'); return false;">Play Game</a>
             </div>
           </div>
         </article>
@@ -516,16 +539,18 @@
           <div class="cover">🐍</div>
           <div class="gameBody">
             <div class="gameTitle">
-              <h3 data-i18n="snakeTitle">Snake Retro</h3>
-              <span class="tag" data-i18n="soon">Soon</span>
+              <h3>Snake Retro</h3>
+              <span class="tag">Soon</span>
             </div>
-            <p class="desc" data-i18n="snakeDesc">Classic snake game with speed levels and a classroom leaderboard idea.</p>
+            <p class="desc">Classic snake game with speed levels and a classroom leaderboard idea.</p>
             <div class="meta">
-              <span data-i18n="reflex">⚡ Reflex</span>
-              <span data-i18n="threeMin">⏱ 3 min</span>
-              <span data-i18n="easy">⭐ Easy</span>
+              <span>⚡ Reflex</span>
+              <span>⏱ 3 min</span>
+              <span>⭐ Easy</span>
             </div>
-            <div class="playRow"><button class="btn alt" disabled data-i18n="comingSoon">Coming Soon</button></div>
+            <div class="playRow">
+              <button class="btn alt" disabled>Coming Soon</button>
+            </div>
           </div>
         </article>
 
@@ -533,16 +558,18 @@
           <div class="cover">🧠</div>
           <div class="gameBody">
             <div class="gameTitle">
-              <h3 data-i18n="memoryTitle">Memory Cards</h3>
-              <span class="tag" data-i18n="soon">Soon</span>
+              <h3>Memory Cards</h3>
+              <span class="tag">Soon</span>
             </div>
-            <p class="desc" data-i18n="memoryDesc">Flip cards, match pairs, and train memory with icons or school subjects.</p>
+            <p class="desc">Flip cards, match pairs, and train memory with icons or school subjects.</p>
             <div class="meta">
-              <span data-i18n="puzzle">🧩 Puzzle</span>
-              <span data-i18n="fourMin">⏱ 4 min</span>
-              <span data-i18n="easy">⭐ Easy</span>
+              <span>🧩 Puzzle</span>
+              <span>⏱ 4 min</span>
+              <span>⭐ Easy</span>
             </div>
-            <div class="playRow"><button class="btn alt" disabled data-i18n="comingSoon">Coming Soon</button></div>
+            <div class="playRow">
+              <button class="btn alt" disabled>Coming Soon</button>
+            </div>
           </div>
         </article>
 
@@ -550,16 +577,18 @@
           <div class="cover">⭕</div>
           <div class="gameBody">
             <div class="gameTitle">
-              <h3 data-i18n="xoTitle">XO Battle</h3>
-              <span class="tag" data-i18n="soon">Soon</span>
+              <h3>XO Battle</h3>
+              <span class="tag">Soon</span>
             </div>
-            <p class="desc" data-i18n="xoDesc">A fast tic-tac-toe challenge for two students on the same device.</p>
+            <p class="desc">A fast tic-tac-toe challenge for two students on the same device.</p>
             <div class="meta">
-              <span data-i18n="twoPlayers">👥 2 Players</span>
-              <span data-i18n="twoMin">⏱ 2 min</span>
-              <span data-i18n="easy">⭐ Easy</span>
+              <span>👥 2 Players</span>
+              <span>⏱ 2 min</span>
+              <span>⭐ Easy</span>
             </div>
-            <div class="playRow"><button class="btn alt" disabled data-i18n="comingSoon">Coming Soon</button></div>
+            <div class="playRow">
+              <button class="btn alt" disabled>Coming Soon</button>
+            </div>
           </div>
         </article>
 
@@ -567,16 +596,18 @@
           <div class="cover">⌨️</div>
           <div class="gameBody">
             <div class="gameTitle">
-              <h3 data-i18n="typingTitle">Typing Sprint</h3>
-              <span class="tag" data-i18n="soon">Soon</span>
+              <h3>Typing Sprint</h3>
+              <span class="tag">Soon</span>
             </div>
-            <p class="desc" data-i18n="typingDesc">A keyboard speed game to help students improve typing accuracy and speed.</p>
+            <p class="desc">A keyboard speed game to help students improve typing accuracy and speed.</p>
             <div class="meta">
-              <span data-i18n="ict">💻 ICT</span>
-              <span data-i18n="oneMin">⏱ 1 min</span>
-              <span data-i18n="medium">⭐ Medium</span>
+              <span>💻 ICT</span>
+              <span>⏱ 1 min</span>
+              <span>⭐ Medium</span>
             </div>
-            <div class="playRow"><button class="btn alt" disabled data-i18n="comingSoon">Coming Soon</button></div>
+            <div class="playRow">
+              <button class="btn alt" disabled>Coming Soon</button>
+            </div>
           </div>
         </article>
 
@@ -584,152 +615,47 @@
           <div class="cover">⚽</div>
           <div class="gameBody">
             <div class="gameTitle">
-              <h3 data-i18n="penaltyTitle">Penalty Shot</h3>
-              <span class="tag" data-i18n="soon">Soon</span>
+              <h3>Penalty Shot</h3>
+              <span class="tag">Soon</span>
             </div>
-            <p class="desc" data-i18n="penaltyDesc">Aim, shoot, and score in a simple football penalty challenge.</p>
+            <p class="desc">Aim, shoot, and score in a simple football penalty challenge.</p>
             <div class="meta">
-              <span data-i18n="skill">🎯 Skill</span>
-              <span data-i18n="threeMin">⏱ 3 min</span>
-              <span data-i18n="medium">⭐ Medium</span>
+              <span>🎯 Skill</span>
+              <span>⏱ 3 min</span>
+              <span>⭐ Medium</span>
             </div>
-            <div class="playRow"><button class="btn alt" disabled data-i18n="comingSoon">Coming Soon</button></div>
+            <div class="playRow">
+              <button class="btn alt" disabled>Coming Soon</button>
+            </div>
           </div>
         </article>
       </section>
     </main>
 
-    <footer id="about" data-i18n="footer">
-      <strong>KKGame</strong> — Khaldoun × Kamel Games. A daily school arcade project for testing small web games with students.
+    <footer id="about">
+      <strong>KKGame</strong> — Khaldoun × Kamel Games.  
+      A daily school arcade project for testing small web games with students.
     </footer>
   </div>
 
-  <script>
-    const translations = {
-      en: {
-        brand:"KKGame",
-        navGames:"Games",
-        navToday:"Game of the Day",
-        navAbout:"About",
-        badge:"🎮 School Arcade Project",
-        heroLine1:"Play smart.",
-        heroLine2:"Learn faster.",
-        lead:"Welcome to KKGame — a simple school-friendly arcade where new HTML games can be added every day for students to play, test, and enjoy.",
-        explore:"Explore Games",
-        playDomino:"Play Domino Duel",
-        screen1:"KKGame",
-        screen2:"Daily Challenge",
-        todayTitle:"Game of the Day",
-        todayDesc:"Start with today’s featured classroom game.",
-        playNow:"Play now",
-        dominoTitle:"Domino Duel",
-        live:"Live",
-        dominoDesc:"A polished domino game against the computer. Match tiles, draw from the boneyard, and win with strategy.",
-        strategy:"🎲 Strategy",
-        fiveMin:"⏱ 5 min",
-        medium:"⭐ Medium",
-        single:"👤 Single Player",
-        playGame:"Play Game",
-        snakeTitle:"Snake Retro",
-        soon:"Soon",
-        snakeDesc:"Classic snake game with speed levels and a classroom leaderboard idea.",
-        reflex:"⚡ Reflex",
-        threeMin:"⏱ 3 min",
-        easy:"⭐ Easy",
-        comingSoon:"Coming Soon",
-        memoryTitle:"Memory Cards",
-        memoryDesc:"Flip cards, match pairs, and train memory with icons or school subjects.",
-        puzzle:"🧩 Puzzle",
-        fourMin:"⏱ 4 min",
-        xoTitle:"XO Battle",
-        xoDesc:"A fast tic-tac-toe challenge for two students on the same device.",
-        twoPlayers:"👥 2 Players",
-        twoMin:"⏱ 2 min",
-        typingTitle:"Typing Sprint",
-        typingDesc:"A keyboard speed game to help students improve typing accuracy and speed.",
-        ict:"💻 ICT",
-        oneMin:"⏱ 1 min",
-        penaltyTitle:"Penalty Shot",
-        penaltyDesc:"Aim, shoot, and score in a simple football penalty challenge.",
-        skill:"🎯 Skill",
-        footer:"KKGame — Khaldoun × Kamel Games. A daily school arcade project for testing small web games with students.",
-        langButton:"العربية"
-      },
-      ar: {
-        brand:"كي كي جيم",
-        navGames:"الألعاب",
-        navToday:"لعبة اليوم",
-        navAbout:"عن الموقع",
-        badge:"🎮 مشروع ألعاب مدرسية",
-        heroLine1:"العب بذكاء.",
-        heroLine2:"وتعلّم أسرع.",
-        lead:"مرحبًا بك في كي كي جيم — منصة ألعاب مدرسية بسيطة يمكن إضافة لعبة HTML جديدة إليها كل يوم ليجربها الطلاب ويستمتعوا بها.",
-        explore:"استكشف الألعاب",
-        playDomino:"العب الدومينو",
-        screen1:"كي كي جيم",
-        screen2:"تحدي اليوم",
-        todayTitle:"لعبة اليوم",
-        todayDesc:"ابدأ بلعبة الفصل المميزة لهذا اليوم.",
-        playNow:"العب الآن",
-        dominoTitle:"تحدي الدومينو",
-        live:"متاحة",
-        dominoDesc:"لعبة دومينو أنيقة ضد الكمبيوتر. طابق القطع، اسحب من البنك، وافز بالذكاء والاستراتيجية.",
-        strategy:"🎲 استراتيجية",
-        fiveMin:"⏱ ٥ دقائق",
-        medium:"⭐ متوسطة",
-        single:"👤 لاعب واحد",
-        playGame:"تشغيل اللعبة",
-        snakeTitle:"الثعبان الكلاسيكي",
-        soon:"قريبًا",
-        snakeDesc:"لعبة الثعبان الكلاسيكية بمستويات سرعة وفكرة لوحة متصدرين للفصل.",
-        reflex:"⚡ سرعة بديهة",
-        threeMin:"⏱ ٣ دقائق",
-        easy:"⭐ سهلة",
-        comingSoon:"قريبًا",
-        memoryTitle:"بطاقات الذاكرة",
-        memoryDesc:"اقلب البطاقات، طابق الأزواج، ودرّب الذاكرة باستخدام رموز أو مواد مدرسية.",
-        puzzle:"🧩 ألغاز",
-        fourMin:"⏱ ٤ دقائق",
-        xoTitle:"تحدي XO",
-        xoDesc:"تحدي إكس أو سريع لطالبين على نفس الجهاز.",
-        twoPlayers:"👥 لاعبان",
-        twoMin:"⏱ دقيقتان",
-        typingTitle:"سباق الكتابة",
-        typingDesc:"لعبة سرعة كتابة تساعد الطلاب على تحسين الدقة والسرعة على لوحة المفاتيح.",
-        ict:"💻 حاسب آلي",
-        oneMin:"⏱ دقيقة واحدة",
-        penaltyTitle:"ضربة جزاء",
-        penaltyDesc:"صوّب، سدّد، وسجّل في تحدي كرة قدم بسيط.",
-        skill:"🎯 مهارة",
-        footer:"كي كي جيم — ألعاب خلدون × كامل. مشروع ألعاب مدرسية يومية لتجربة ألعاب ويب صغيرة مع الطلاب.",
-        langButton:"English"
-      }
-    };
+<div class="gameOverlay" id="gameOverlay">
+  <div class="gameOverlayTop">
+    <div class="gameOverlayTitle">🎲 Domino Duel</div>
+    <button class="closeGameBtn" onclick="closeGame()">إغلاق اللعبة</button>
+  </div>
+  <iframe id="gameFrame" src=""></iframe>
+</div>
 
-    let currentLang = localStorage.getItem("kkgame_lang") || "en";
+<script>
+function openGame(file){
+  document.getElementById("gameFrame").src = file;
+  document.getElementById("gameOverlay").style.display = "flex";
+}
+function closeGame(){
+  document.getElementById("gameFrame").src = "";
+  document.getElementById("gameOverlay").style.display = "none";
+}
+</script>
 
-    function applyLanguage(lang){
-      currentLang = lang;
-      localStorage.setItem("kkgame_lang", lang);
-
-      document.documentElement.lang = lang;
-      document.documentElement.dir = lang === "ar" ? "rtl" : "ltr";
-      document.body.setAttribute("dir", lang === "ar" ? "rtl" : "ltr");
-
-      document.querySelectorAll("[data-i18n]").forEach(el=>{
-        const key = el.getAttribute("data-i18n");
-        if(translations[lang][key]) el.innerHTML = translations[lang][key];
-      });
-
-      document.getElementById("langBtn").textContent = translations[lang].langButton;
-      document.title = lang === "ar" ? "كي كي جيم - منصة ألعاب مدرسية" : "KKGame - School Game Arcade";
-    }
-
-    function toggleLanguage(){
-      applyLanguage(currentLang === "en" ? "ar" : "en");
-    }
-
-    applyLanguage(currentLang);
-  </script>
 </body>
 </html>
