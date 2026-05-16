@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1,user-scalable=no">
+<title>Snake Retro - QKPlay Arcade</title>
+<style>
+:root{
+  --bg:#070914;
+  --bg2:#10172a;
+  --panel:#121a2f;
+  --panel2:#17233d;
+  --qatar:#8a1538;
+  --gold:#ffd166;
+  --cyan:#36d1dc;
+  --green:#54e38e;
+  --red:#ff5c7a;
+  --text:#f7f7fb;
+  --muted:#aeb7cf;
+  --line:rgba(255,255,255,.13);
+  --shadow:0 24px 70px rgba(0,0,0,.35);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none}
+body{
+  margin:0;
+  min-height:100vh;
+  font-family:Tahoma, Arial, sans-serif;
+  color:var(--text);
+  background:
+    radial-gradient(circle at 15% 10%, rgba(138,21,56,.42), transparent 28%),
+    radial-gradient(circle at 85% 15%, rgba(54,209,220,.25), transparent 25%),
+    radial-gradient(circle at 50% 100%, rgba(255,209,102,.13), transparent 32%),
+    linear-gradient(135deg,var(--bg),var(--bg2));
+  overflow:hidden;
+}
+body:before{
+  content:"";
+  position:fixed;inset:0;pointer-events:none;
+  background-image:
+    linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
+  background-size:42px 42px;
+  mask-image:linear-gradient(to bottom, black, transparent 82%);
+}
+.wrap{
+  width:min(1100px,96vw);
+  height:100vh;
+  margin:auto;
+  padding:14px 0 18px;
+  display:grid;
+  grid-template-rows:auto auto 1fr auto;
+  gap:12px;
+  position:relative;
+  z-index:1;
+}
+.topbar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:12px 14px;
+  border:1px solid var(--line);
+  background:rgba(255,255,255,.07);
+  backdrop-filter:blur(14px);
+  border-radius:24px;
+  box-shadow:0 12px 40px rgba(0,0,0,.22);
+}
+.brand{display:flex;align-items:center;gap:12px;font-weight:950;font-size:24px}
+.logo{
+  width:48px;height:48px;display:grid;place-items:center;border-radius:16px;color:#fff;
+  background:linear-gradient(135deg,var(--qatar),#4b0b20 52%,#10172a);
+  border:1px solid rgba(255,255,255,.2);
+  box-shadow:0 10px 28px rgba(138,21,56,.35);
+  font-size:24px;font-weight:1000;
+}
+.actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.btn{
+  border:0;border-radius:16px;padding:11px 15px;font-weight:950;cursor:pointer;
+  color:#08111e;background:linear-gradient(135deg,#fff,var(--gold));
+  box-shadow:0 14px 30px rgba(255,209,102,.18);
+  transition:.15s transform,.15s filter;
+}
+.btn:hover{transform:translateY(-2px);filter:brightness(1.04)}
+.btn.alt{
+  color:white;background:rgba(255,255,255,.09);border:1px solid var(--line);box-shadow:none;
+}
+.stats{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:10px;
+}
+.pill{
+  background:rgba(255,255,255,.07);
+  border:1px solid var(--line);
+  border-radius:18px;
+  padding:10px;
+  text-align:center;
+  color:#edf2ff;
+  font-weight:900;
+}
+.pill small{display:block;color:var(--muted);font-size:11px;margin-bottom:3px}
+.gameArea{
+  display:grid;
+  grid-template-columns:1fr 260px;
+  gap:12px;
+  min-height:0;
+}
+.boardPanel{
+  position:relative;
+  border:1px solid rgba(255,209,102,.18);
+  background:
+    radial-gradient(circle at center,rgba(84,227,142,.16),transparent 34%),
+    linear-gradient(135deg,#0b5a43,#07372b);
+  border-radius:28px;
+  box-shadow:0 18px 46px rgba(0,0,0,.24);
+  overflow:hidden;
+  display:grid;
+  place-items:center;
+}
+.boardPanel:before{
+  content:"";
+  position:absolute;
+  inset:15px;
+  border:3px solid rgba(255,209,102,.28);
+  border-radius:24px;
+  pointer-events:none;
+}
+canvas{
+  width:min(72vh,100%);
+  height:min(72vh,100%);
+  max-width:100%;
+  max-height:100%;
+  image-rendering:pixelated;
+  position:relative;
+  z-index:2;
+}
+.sidePanel{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  min-height:0;
+}
+.card{
+  border:1px solid var(--line);
+  background:linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.045));
+  box-shadow:0 18px 46px rgba(0,0,0,.24);
+  border-radius:24px;
+  padding:15px;
+}
+.card h3{margin:0 0 10px;font-size:18px;color:#fff}
+.help{color:var(--muted);line-height:1.6;font-size:14px}
+.levels{display:flex;flex-direction:column;gap:8px}
+.levelBtn{
+  width:100%;
+  border:1px solid var(--line);
+  background:rgba(255,255,255,.07);
+  color:white;
+  border-radius:14px;
+  padding:10px;
+  font-weight:900;
+  cursor:pointer;
+}
+.levelBtn.active{
+  border-color:rgba(255,209,102,.65);
+  background:rgba(255,209,102,.14);
+  color:#ffe6a6;
+}
+.message{
+  min-height:48px;
+  display:grid;
+  place-items:center;
+  text-align:center;
+  padding:10px;
+  border:1px solid var(--line);
+  background:rgba(255,255,255,.07);
+  border-radius:18px;
+  font-size:16px;
+  font-weight:950;
+  color:#fff1bd;
+}
+.mobileControls{
+  display:none;
+  grid-template-columns:70px 70px 70px;
+  grid-template-rows:54px 54px;
+  justify-content:center;
+  gap:8px;
+}
+.dpad{
+  border:1px solid var(--line);
+  border-radius:16px;
+  background:rgba(255,255,255,.10);
+  color:white;
+  font-size:24px;
+  font-weight:900;
+  cursor:pointer;
+}
+.dpad.up{grid-column:2}
+.dpad.left{grid-column:1}
+.dpad.down{grid-column:2}
+.dpad.right{grid-column:3}
+.overlay{
+  position:absolute;
+  inset:0;
+  z-index:5;
+  display:grid;
+  place-items:center;
+  background:rgba(0,0,0,.34);
+  backdrop-filter:blur(4px);
+}
+.startBox{
+  width:min(430px,90%);
+  text-align:center;
+  border:1px solid rgba(255,255,255,.18);
+  background:linear-gradient(180deg,rgba(18,26,47,.96),rgba(10,14,28,.96));
+  border-radius:26px;
+  padding:28px 20px;
+  box-shadow:0 24px 70px rgba(0,0,0,.45);
+}
+.startIcon{font-size:72px;margin-bottom:10px}
+.startBox h1{margin:0 0 10px;font-size:32px}
+.startBox p{color:var(--muted);line-height:1.7;margin:0 0 18px}
+.hidden{display:none!important}
+@media(max-width:850px){
+  body{overflow:auto}
+  .wrap{height:auto;min-height:100vh}
+  .gameArea{grid-template-columns:1fr}
+  .sidePanel{order:2}
+  canvas{width:94vw;height:94vw;max-height:62vh}
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .mobileControls{display:grid}
+}
+@media(max-width:560px){
+  .topbar{flex-direction:column;text-align:center}
+  .brand{justify-content:center}
+  .actions{justify-content:center}
+  .wrap{width:94vw}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="topbar">
+    <div class="brand"><span class="logo">🐍</span><span id="title">الثعبان الكلاسيكي</span></div>
+    <div class="actions">
+      <button class="btn alt" onclick="toggleLang()" id="langBtn">English</button>
+      <button class="btn alt" onclick="goHome()" id="backBtn">العودة للمنصة</button>
+      <button class="btn" onclick="restartGame()" id="newBtn">لعبة جديدة</button>
+    </div>
+  </header>
+
+  <section class="stats">
+    <div class="pill"><small id="scoreLabel">النقاط</small><span id="score">0</span></div>
+    <div class="pill"><small id="bestLabel">أفضل نتيجة</small><span id="best">0</span></div>
+    <div class="pill"><small id="speedLabel">السرعة</small><span id="speedText">متوسطة</span></div>
+    <div class="pill"><small id="lengthLabel">الطول</small><span id="lengthText">3</span></div>
+  </section>
+
+  <main class="gameArea">
+    <section class="boardPanel">
+      <canvas id="gameCanvas" width="600" height="600"></canvas>
+      <div class="overlay" id="overlay">
+        <div class="startBox">
+          <div class="startIcon">🐍</div>
+          <h1 id="startTitle">Snake Retro</h1>
+          <p id="startDesc">اجمع التفاح، وتجنب الاصطدام بالحائط أو بنفسك.</p>
+          <button class="btn" onclick="startGame()" id="startBtn">ابدأ اللعب</button>
+        </div>
+      </div>
+    </section>
+
+    <aside class="sidePanel">
+      <div class="card">
+        <h3 id="levelsTitle">مستوى السرعة</h3>
+        <div class="levels">
+          <button class="levelBtn" data-speed="150" data-name-ar="سهلة" data-name-en="Easy">⭐ <span>سهلة</span></button>
+          <button class="levelBtn active" data-speed="105" data-name-ar="متوسطة" data-name-en="Medium">⭐ <span>متوسطة</span></button>
+          <button class="levelBtn" data-speed="72" data-name-ar="سريعة" data-name-en="Fast">⚡ <span>سريعة</span></button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 id="howTitle">طريقة اللعب</h3>
+        <div class="help" id="helpText">
+          الكمبيوتر: استخدم الأسهم في لوحة المفاتيح.<br>
+          الموبايل: استخدم أزرار الاتجاهات أسفل الشاشة.
+        </div>
+      </div>
+
+      <div class="message" id="message">اضغط ابدأ للعب.</div>
+    </aside>
+  </main>
+
+  <section class="mobileControls">
+    <button class="dpad up" onclick="setDirection('up')">↑</button>
+    <button class="dpad left" onclick="setDirection('left')">←</button>
+    <button class="dpad down" onclick="setDirection('down')">↓</button>
+    <button class="dpad right" onclick="setDirection('right')">→</button>
+  </section>
+</div>
+
+<script>
+let lang="ar";
+const T={
+  ar:{
+    title:"الثعبان الكلاسيكي", back:"العودة للمنصة", newGame:"لعبة جديدة",
+    score:"النقاط", best:"أفضل نتيجة", speed:"السرعة", length:"الطول",
+    levels:"مستوى السرعة", how:"طريقة اللعب",
+    help:"الكمبيوتر: استخدم الأسهم في لوحة المفاتيح.<br>الموبايل: استخدم أزرار الاتجاهات أسفل الشاشة.",
+    startTitle:"Snake Retro", startDesc:"اجمع التفاح، وتجنب الاصطدام بالحائط أو بنفسك.",
+    start:"ابدأ اللعب", msgStart:"اضغط ابدأ للعب.", msgRun:"اللعبة تعمل الآن.", msgOver:"انتهت اللعبة! اضغط لعبة جديدة.",
+    easy:"سهلة", medium:"متوسطة", fast:"سريعة", langBtn:"English"
+  },
+  en:{
+    title:"Snake Retro", back:"Back to Arcade", newGame:"New Game",
+    score:"Score", best:"Best Score", speed:"Speed", length:"Length",
+    levels:"Speed Level", how:"How to Play",
+    help:"Computer: use keyboard arrows.<br>Mobile: use the direction buttons below.",
+    startTitle:"Snake Retro", startDesc:"Collect apples, avoid walls, and do not hit yourself.",
+    start:"Start Game", msgStart:"Press start to play.", msgRun:"Game is running.", msgOver:"Game over! Press New Game.",
+    easy:"Easy", medium:"Medium", fast:"Fast", langBtn:"العربية"
+  }
+};
+
+const canvas=document.getElementById("gameCanvas");
+const ctx=canvas.getContext("2d");
+const grid=24;
+const cells=25;
+let snake, apple, dir, nextDir, score, best, timer, running, gameOver, speed=105;
+let speedNameAr="متوسطة", speedNameEn="Medium";
+
+function goHome(){
+  if(window.parent && window.parent.closeGame){ window.parent.closeGame(); }
+  else location.href="index.html";
+}
+function tr(key){return T[lang][key]}
+function updateLang(){
+  document.documentElement.lang=lang;
+  document.documentElement.dir=lang==="ar"?"rtl":"ltr";
+  document.body.dir=lang==="ar"?"rtl":"ltr";
+  document.getElementById("title").textContent=tr("title");
+  document.getElementById("backBtn").textContent=tr("back");
+  document.getElementById("newBtn").textContent=tr("newGame");
+  document.getElementById("scoreLabel").textContent=tr("score");
+  document.getElementById("bestLabel").textContent=tr("best");
+  document.getElementById("speedLabel").textContent=tr("speed");
+  document.getElementById("lengthLabel").textContent=tr("length");
+  document.getElementById("levelsTitle").textContent=tr("levels");
+  document.getElementById("howTitle").textContent=tr("how");
+  document.getElementById("helpText").innerHTML=tr("help");
+  document.getElementById("startTitle").textContent=tr("startTitle");
+  document.getElementById("startDesc").textContent=tr("startDesc");
+  document.getElementById("startBtn").textContent=tr("start");
+  document.getElementById("langBtn").textContent=tr("langBtn");
+  document.getElementById("speedText").textContent=lang==="ar"?speedNameAr:speedNameEn;
+  document.querySelectorAll(".levelBtn").forEach(btn=>{
+    btn.querySelector("span").textContent=lang==="ar"?btn.dataset.nameAr:btn.dataset.nameEn;
+  });
+  if(!running && !gameOver) document.getElementById("message").textContent=tr("msgStart");
+  if(running) document.getElementById("message").textContent=tr("msgRun");
+  if(gameOver) document.getElementById("message").textContent=tr("msgOver");
+}
+function toggleLang(){lang=lang==="ar"?"en":"ar";updateLang();}
+function resetState(){
+  snake=[{x:12,y:12},{x:11,y:12},{x:10,y:12}];
+  dir={x:1,y:0}; nextDir={x:1,y:0};
+  score=0; running=false; gameOver=false;
+  placeApple();
+  updateStats();
+  draw();
+
+  const overlay=document.getElementById("overlay");
+  const startTitle=document.getElementById("startTitle");
+  const startDesc=document.getElementById("startDesc");
+  const startBtn=document.getElementById("startBtn");
+
+  overlay.classList.remove("hidden");
+  startTitle.textContent=tr("startTitle");
+  startDesc.textContent=tr("startDesc");
+  startBtn.textContent=tr("start");
+  startBtn.onclick=startGame;
+
+  document.getElementById("message").textContent=tr("msgStart");
+}
+function startGame(){
+  if(running)return;
+  document.getElementById("overlay").classList.add("hidden");
+  running=true; gameOver=false;
+  dir={x:1,y:0};
+  nextDir={x:1,y:0};
+  document.getElementById("message").textContent=tr("msgRun");
+  clearInterval(timer);
+  timer=setInterval(step,speed);
+}
+function restartGame(){
+  clearInterval(timer);
+  timer=null;
+  resetState();
+}
+function updateStats(){
+  best=Number(localStorage.getItem("qk_snake_best")||0);
+  document.getElementById("score").textContent=score;
+  document.getElementById("best").textContent=Math.max(best,score);
+  document.getElementById("lengthText").textContent=snake.length;
+  document.getElementById("speedText").textContent=lang==="ar"?speedNameAr:speedNameEn;
+}
+function placeApple(){
+  do{
+    apple={x:Math.floor(Math.random()*cells),y:Math.floor(Math.random()*cells)};
+  }while(snake && snake.some(p=>p.x===apple.x && p.y===apple.y));
+}
+function setDirection(d){
+  const map={up:{x:0,y:-1},down:{x:0,y:1},left:{x:-1,y:0},right:{x:1,y:0}};
+  const nd=map[d];
+  if(!nd)return;
+  if(nd.x===-dir.x && nd.y===-dir.y)return;
+  nextDir=nd;
+}
+function step(){
+  dir=nextDir;
+  const head={x:snake[0].x+dir.x,y:snake[0].y+dir.y};
+  if(head.x<0 || head.y<0 || head.x>=cells || head.y>=cells || snake.some(p=>p.x===head.x && p.y===head.y)){
+    endGame();
+    return;
+  }
+  snake.unshift(head);
+  if(head.x===apple.x && head.y===apple.y){
+    score+=10;
+    placeApple();
+  }else{
+    snake.pop();
+  }
+  updateStats();
+  draw();
+}
+function endGame(){
+  clearInterval(timer);
+  running=false; gameOver=true;
+  best=Math.max(Number(localStorage.getItem("qk_snake_best")||0),score);
+  localStorage.setItem("qk_snake_best",String(best));
+  updateStats();
+  document.getElementById("overlay").classList.remove("hidden");
+  document.getElementById("startTitle").textContent=lang==="ar"?"انتهت اللعبة":"Game Over";
+  document.getElementById("startDesc").textContent=(lang==="ar"?"نتيجتك: ":"Your score: ")+score;
+  document.getElementById("startBtn").textContent=tr("newGame");
+  document.getElementById("startBtn").onclick=restartGame;
+  document.getElementById("message").textContent=tr("msgOver");
+}
+function draw(){
+  const w=canvas.width, h=canvas.height, cell=w/cells;
+  ctx.clearRect(0,0,w,h);
+  const grd=ctx.createLinearGradient(0,0,w,h);
+  grd.addColorStop(0,"#08291f"); grd.addColorStop(1,"#0b5a43");
+  ctx.fillStyle=grd; ctx.fillRect(0,0,w,h);
+  ctx.strokeStyle="rgba(255,255,255,.035)";
+  ctx.lineWidth=1;
+  for(let i=0;i<=cells;i++){
+    ctx.beginPath(); ctx.moveTo(i*cell,0); ctx.lineTo(i*cell,h); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0,i*cell); ctx.lineTo(w,i*cell); ctx.stroke();
+  }
+  // apple
+  ctx.fillStyle="#ff5c7a";
+  roundRect(apple.x*cell+5,apple.y*cell+5,cell-10,cell-10,9,true);
+  ctx.fillStyle="#ffd166";
+  ctx.beginPath();ctx.arc(apple.x*cell+cell*0.65,apple.y*cell+cell*0.27,3,0,Math.PI*2);ctx.fill();
+
+  // snake
+  snake.forEach((p,i)=>{
+    const x=p.x*cell+3,y=p.y*cell+3,s=cell-6;
+    ctx.fillStyle=i===0?"#ffd166":"#54e38e";
+    roundRect(x,y,s,s,8,true);
+    if(i===0){
+      ctx.fillStyle="#08111e";
+      ctx.beginPath();ctx.arc(x+s*.32,y+s*.35,3,0,Math.PI*2);ctx.fill();
+      ctx.beginPath();ctx.arc(x+s*.68,y+s*.35,3,0,Math.PI*2);ctx.fill();
+    }
+  });
+}
+function roundRect(x,y,w,h,r,fill){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);
+  ctx.arcTo(x+w,y,x+w,y+h,r);
+  ctx.arcTo(x+w,y+h,x,y+h,r);
+  ctx.arcTo(x,y+h,x,y,r);
+  ctx.arcTo(x,y,x+w,y,r);
+  ctx.closePath();
+  if(fill)ctx.fill();
+}
+document.addEventListener("keydown",e=>{
+  if(e.key==="ArrowUp")setDirection("up");
+  if(e.key==="ArrowDown")setDirection("down");
+  if(e.key==="ArrowLeft")setDirection("left");
+  if(e.key==="ArrowRight")setDirection("right");
+  if(e.key===" "){
+    e.preventDefault();
+    if(!running) startGame();
+  }
+});
+document.querySelectorAll(".levelBtn").forEach(btn=>{
+  btn.onclick=()=>{
+    document.querySelectorAll(".levelBtn").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    speed=Number(btn.dataset.speed);
+    speedNameAr=btn.dataset.nameAr;
+    speedNameEn=btn.dataset.nameEn;
+    if(running){clearInterval(timer);timer=setInterval(step,speed);}
+    updateLang();
+  };
+});
+resetState();
+updateLang();
+</script>
+</body>
+</html>
