@@ -657,5 +657,55 @@ function closeGame(){
 }
 </script>
 
+
+<!-- QK GLOBAL RADIO START -->
+<style>
+body{padding-bottom:74px!important}
+.qk-radio-bar{position:fixed;left:14px;right:14px;bottom:12px;z-index:100000;min-height:54px;display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:20px;border:1px solid rgba(255,209,102,.22);background:linear-gradient(135deg,rgba(138,21,56,.28),rgba(10,14,28,.96));backdrop-filter:blur(14px);box-shadow:0 18px 45px rgba(0,0,0,.42);color:#f7f7fb;font-family:Tahoma,Arial,sans-serif}
+.qk-radio-logo{width:38px;height:38px;border-radius:14px;display:grid;place-items:center;background:rgba(255,209,102,.16);border:1px solid rgba(255,209,102,.25);font-size:20px;flex:0 0 auto}
+.qk-radio-info{min-width:0;flex:1}.qk-radio-title{font-weight:900;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.qk-radio-sub{color:#aeb7cf;font-size:11px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.qk-radio-controls{display:flex;align-items:center;gap:8px;flex:0 0 auto}.qk-radio-btn{border:0;border-radius:13px;min-width:42px;height:38px;padding:0 11px;font-weight:900;cursor:pointer;color:#08111e;background:linear-gradient(135deg,#fff,#ffd166);box-shadow:0 8px 18px rgba(255,209,102,.12)}
+.qk-radio-btn.secondary{color:white;background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.16);box-shadow:none}.qk-radio-vol{width:90px;accent-color:#ffd166}.qk-radio-status{font-size:11px;color:#aeb7cf;min-width:64px;text-align:center}
+@media(max-width:650px){body{padding-bottom:112px!important}.qk-radio-bar{left:8px;right:8px;bottom:8px;flex-wrap:wrap;border-radius:18px;gap:8px}.qk-radio-info{flex-basis:calc(100% - 52px)}.qk-radio-controls{width:100%;justify-content:space-between}.qk-radio-vol{width:80px}}
+</style>
+<div class="qk-radio-bar" id="qkRadioBar">
+  <div class="qk-radio-logo">📻</div>
+  <div class="qk-radio-info">
+    <div class="qk-radio-title">إذاعة القرآن الكريم مصر</div>
+    <div class="qk-radio-sub">تعمل في كل صفحات وألعاب QKPlay Arcade</div>
+  </div>
+  <div class="qk-radio-controls">
+    <button class="qk-radio-btn" id="qkRadioPlay">▶</button>
+    <button class="qk-radio-btn secondary" id="qkRadioCast" title="Cast">📺 Cast</button>
+    <input class="qk-radio-vol" id="qkRadioVol" type="range" min="0" max="1" step="0.05" value="0.55">
+    <div class="qk-radio-status" id="qkRadioStatus">Ready</div>
+  </div>
+  <audio id="qkRadioAudio" crossorigin="anonymous" preload="none"></audio>
+</div>
+<script>
+(function(){
+  const QURAN_EGYPT_STREAM="https://stream.radiojar.com/8s5u5tpdtwzuv";
+  const audio=document.getElementById("qkRadioAudio");
+  const playBtn=document.getElementById("qkRadioPlay");
+  const castBtn=document.getElementById("qkRadioCast");
+  const vol=document.getElementById("qkRadioVol");
+  const status=document.getElementById("qkRadioStatus");
+  if(!audio||!playBtn)return;
+  audio.src=QURAN_EGYPT_STREAM;
+  audio.volume=Number(localStorage.getItem("qk_radio_volume")||"0.55");
+  if(vol){vol.value=audio.volume;vol.addEventListener("input",()=>{audio.volume=Number(vol.value);localStorage.setItem("qk_radio_volume",String(audio.volume));});}
+  function setStatus(txt){if(status)status.textContent=txt;}
+  function setPlayingUI(isPlaying){playBtn.textContent=isPlaying?"⏸":"▶";setStatus(isPlaying?"Playing":"Paused");}
+  playBtn.addEventListener("click",async()=>{try{if(audio.paused){if(!audio.src)audio.src=QURAN_EGYPT_STREAM;await audio.play();setPlayingUI(true);}else{audio.pause();setPlayingUI(false);}}catch(e){setStatus("Blocked");alert("المتصفح منع التشغيل التلقائي. اضغط تشغيل مرة أخرى، أو تأكد من السماح بالصوت.");}});
+  audio.addEventListener("play",()=>setPlayingUI(true));
+  audio.addEventListener("pause",()=>setPlayingUI(false));
+  audio.addEventListener("waiting",()=>setStatus("Loading"));
+  audio.addEventListener("playing",()=>setStatus("Playing"));
+  audio.addEventListener("error",()=>setStatus("Error"));
+  if(castBtn){castBtn.addEventListener("click",async()=>{try{if(audio.remote&&typeof audio.remote.prompt==="function"){await audio.remote.prompt();return;}if("PresentationRequest" in window){const request=new PresentationRequest([location.href]);await request.start();return;}alert("الكاست غير مدعوم في هذا المتصفح. جرّب Chrome أو Edge مع Chromecast أو Android TV على نفس الشبكة.");}catch(e){alert("لم يتم تشغيل الكاست. تأكد أن التلفزيون أو Chromecast على نفس الشبكة.");}});}
+})();
+</script>
+<!-- QK GLOBAL RADIO END -->
+
 </body>
 </html>
