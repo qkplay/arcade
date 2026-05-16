@@ -1,1 +1,581 @@
-<html><body><h1>Domino Duel</h1><button onclick="alert('Game Loaded')">Start</button></body></html>
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>تحدي الدومينو - QKPlay Arcade</title>
+<style>
+:root{
+  --bg:#070914;
+  --bg2:#10172a;
+  --card:#121a2f;
+  --card2:#17233d;
+  --qatar:#8a1538;
+  --gold:#ffd166;
+  --cyan:#36d1dc;
+  --green:#54e38e;
+  --text:#f7f7fb;
+  --muted:#aeb7cf;
+  --line:rgba(255,255,255,.13);
+  --shadow:0 24px 70px rgba(0,0,0,.35);
+  --felt:#0b5a43;
+  --felt2:#07372b;
+  --ivory:#fff4dc;
+  --ivory2:#d9c49e;
+  --ink:#17120d;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  min-height:100vh;
+  font-family:Tahoma, Arial, sans-serif;
+  color:var(--text);
+  background:
+    radial-gradient(circle at 15% 10%, rgba(138,21,56,.42), transparent 28%),
+    radial-gradient(circle at 85% 15%, rgba(54,209,220,.25), transparent 25%),
+    radial-gradient(circle at 50% 100%, rgba(255,209,102,.13), transparent 32%),
+    linear-gradient(135deg,var(--bg),var(--bg2));
+  overflow-x:hidden;
+}
+body:before{
+  content:"";
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  background-image:
+    linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
+  background-size:42px 42px;
+  mask-image:linear-gradient(to bottom, black, transparent 82%);
+}
+.wrap{
+  width:min(1180px,94vw);
+  margin:auto;
+  padding:18px 0 34px;
+  position:relative;
+  z-index:1;
+}
+.topbar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:14px 16px;
+  border:1px solid var(--line);
+  background:rgba(255,255,255,.07);
+  backdrop-filter:blur(14px);
+  border-radius:24px;
+  box-shadow:0 12px 40px rgba(0,0,0,.22);
+  margin-bottom:14px;
+}
+.brand{display:flex;align-items:center;gap:12px;font-weight:950;font-size:25px}
+.logo{
+  width:48px;height:48px;display:grid;place-items:center;border-radius:16px;color:#fff;
+  background:linear-gradient(135deg,var(--qatar),#4b0b20 52%,#10172a);
+  border:1px solid rgba(255,255,255,.2);
+  box-shadow:0 10px 28px rgba(138,21,56,.35);
+  font-size:22px;font-weight:1000;
+}
+.actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.btn{
+  border:0;border-radius:16px;padding:12px 16px;font-weight:950;cursor:pointer;
+  color:#08111e;background:linear-gradient(135deg,#fff,var(--gold));
+  box-shadow:0 14px 30px rgba(255,209,102,.18);
+  transition:.15s transform,.15s filter;
+}
+.btn:hover{transform:translateY(-2px);filter:brightness(1.04)}
+.btn.alt{
+  color:white;background:rgba(255,255,255,.09);border:1px solid var(--line);box-shadow:none;
+}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
+.stats{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:10px;
+  margin-bottom:14px;
+}
+.pill{
+  background:rgba(255,255,255,.07);
+  border:1px solid var(--line);
+  border-radius:18px;
+  padding:12px;
+  text-align:center;
+  color:#edf2ff;
+  font-weight:900;
+}
+.pill small{display:block;color:var(--muted);font-size:12px;margin-bottom:4px}
+.game{
+  display:grid;
+  grid-template-rows:auto 1fr auto auto;
+  gap:12px;
+}
+.panel{
+  border:1px solid var(--line);
+  background:linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.045));
+  box-shadow:0 18px 46px rgba(0,0,0,.24);
+  border-radius:26px;
+}
+.handBox{padding:13px}
+.handTitle{
+  display:flex;justify-content:space-between;align-items:center;
+  color:#f4e8ff;font-weight:950;margin-bottom:8px;
+}
+.hiddenHand,.playerHand{
+  min-height:86px;
+  display:flex;
+  gap:9px;
+  align-items:center;
+  overflow-x:auto;
+  padding:8px 4px;
+}
+.hiddenTile{
+  width:42px;height:76px;flex:0 0 auto;border-radius:13px;
+  background:linear-gradient(145deg,#242b41,#090b12);
+  border:2px solid rgba(255,255,255,.25);
+  box-shadow:inset 0 2px 6px rgba(255,255,255,.1),0 10px 18px rgba(0,0,0,.35);
+}
+.table{
+  position:relative;
+  min-height:310px;
+  overflow:auto;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:18px;
+  background:
+    radial-gradient(circle at center,rgba(84,227,142,.18),transparent 34%),
+    linear-gradient(135deg,var(--felt),var(--felt2));
+}
+.table:before{
+  content:"";
+  position:absolute;
+  inset:16px;
+  border:3px solid rgba(255,209,102,.32);
+  border-radius:24px;
+  pointer-events:none;
+}
+.chain{
+  min-width:max-content;
+  display:flex;
+  align-items:center;
+  gap:7px;
+  padding:35px;
+  position:relative;
+  z-index:1;
+}
+.domino{
+  flex:0 0 auto;
+  width:88px;
+  height:44px;
+  border-radius:11px;
+  background:
+    linear-gradient(145deg,rgba(255,255,255,.96),rgba(255,255,255,0) 25%),
+    linear-gradient(180deg,var(--ivory),var(--ivory2));
+  border:2px solid #15100a;
+  display:flex;
+  align-items:center;
+  justify-content:space-around;
+  box-shadow:inset 0 2px 4px rgba(255,255,255,.7), inset 0 -7px 12px rgba(0,0,0,.16),0 10px 18px rgba(0,0,0,.42);
+  cursor:pointer;
+  user-select:none;
+  position:relative;
+}
+.domino.vertical{width:44px;height:88px;flex-direction:column}
+.domino:before{
+  content:"";position:absolute;background:#211912;border-radius:99px;opacity:.82;
+}
+.domino:not(.vertical):before{width:2px;height:78%;left:50%;top:11%}
+.domino.vertical:before{height:2px;width:78%;top:50%;left:11%}
+.half{
+  width:39px;height:39px;
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  grid-template-rows:repeat(3,1fr);
+  padding:5px;
+  gap:1px;
+}
+.pip{
+  width:6px;height:6px;border-radius:50%;
+  background:#16110d;
+  align-self:center;justify-self:center;
+  opacity:0;
+}
+.pip.on{opacity:1}
+.playerHand .domino{width:78px;height:39px}
+.playerHand .domino.vertical{width:39px;height:78px}
+.playerHand .half{width:34px;height:34px;padding:4px}
+.playerHand .pip{width:5.5px;height:5.5px}
+.playerHand .domino.playable{
+  outline:3px solid var(--gold);
+  transform:translateY(-4px);
+  box-shadow:inset 0 2px 4px rgba(255,255,255,.7), inset 0 -7px 12px rgba(0,0,0,.14),0 0 0 5px rgba(255,209,102,.14),0 12px 20px rgba(0,0,0,.44);
+}
+.playerHand .domino:hover{transform:translateY(-8px)}
+.message{
+  min-height:54px;
+  display:grid;
+  place-items:center;
+  text-align:center;
+  padding:13px;
+  font-size:18px;
+  font-weight:950;
+  color:#fff1bd;
+}
+.controls{
+  display:flex;
+  gap:8px;
+  justify-content:center;
+  flex-wrap:wrap;
+  padding:12px;
+}
+.empty{
+  color:#f4e6c6;
+  font-weight:950;
+  font-size:20px;
+  text-align:center;
+  padding:40px;
+}
+.modal{
+  position:fixed;
+  inset:0;
+  z-index:50;
+  display:none;
+  place-items:center;
+  background:rgba(0,0,0,.66);
+  padding:18px;
+}
+.modalBox{
+  width:min(460px,94vw);
+  border-radius:26px;
+  background:linear-gradient(180deg,#fff9eb,#ead7b4);
+  color:#201207;
+  padding:24px;
+  text-align:center;
+  box-shadow:0 30px 80px rgba(0,0,0,.55);
+}
+.choiceTile{display:flex;justify-content:center;margin:14px 0 18px}
+.modalActions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+@media(max-width:760px){
+  .topbar{flex-direction:column;text-align:center}
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .table{min-height:250px;justify-content:flex-start}
+  .chain{padding:22px}
+  .domino{width:74px;height:38px}
+  .domino.vertical{width:38px;height:74px}
+  .half{width:33px;height:33px;padding:4px}
+  .pip{width:5px;height:5px}
+}
+</style>
+
+<style>
+/* QKPlay: keep radio limited to Quran Radio Egypt */
+#rs-file-input,
+label[for="rs-file-input"],
+#rs-url-btn,
+#rs-file-list {
+  display:none!important;
+}
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <header class="topbar">
+    <div class="brand"><span class="logo">KK</span><span>تحدي الدومينو</span></div>
+    <div class="actions">
+      <button class="btn alt" onclick="goHome()">العودة للمنصة</button>
+      <button class="btn" onclick="newRound()">جولة جديدة</button>
+    </div>
+  </header>
+
+  <section class="stats">
+    <div class="pill"><small>البنك</small><span id="boneyardCount">0</span></div>
+    <div class="pill"><small>قطعك</small><span id="playerCount">0</span></div>
+    <div class="pill"><small>قطع الكمبيوتر</small><span id="cpuCount">0</span></div>
+    <div class="pill"><small>الأطراف</small><span id="ends">-</span></div>
+  </section>
+
+  <main class="game">
+    <section class="panel handBox">
+      <div class="handTitle"><span>🤖 الكمبيوتر</span><span>النقاط: <b id="cpuPips">0</b></span></div>
+      <div class="hiddenHand" id="cpuHand"></div>
+    </section>
+
+    <section class="panel table">
+      <div class="chain" id="chain"></div>
+    </section>
+
+    <div class="panel message" id="message">ابدأ اللعب باختيار أي حجر.</div>
+
+    <section class="panel handBox">
+      <div class="handTitle"><span>👤 أنت</span><span>النقاط: <b id="playerPips">0</b></span></div>
+      <div class="playerHand" id="playerHand"></div>
+      <div class="controls">
+        <button class="btn" id="drawBtn" onclick="drawForPlayer()">اسحب من البنك</button>
+        <button class="btn alt" onclick="passTurn()">تمرير</button>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div class="modal" id="sideModal">
+  <div class="modalBox">
+    <h2>تلعب الحجر في أي طرف؟</h2>
+    <p>هذا الحجر يصلح في الطرفين.</p>
+    <div class="choiceTile" id="choiceTile"></div>
+    <div class="modalActions">
+      <button class="btn" id="leftChoice">اليسار</button>
+      <button class="btn" id="rightChoice">اليمين</button>
+      <button class="btn alt" onclick="closeModal()">إلغاء</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let player=[], cpu=[], boneyard=[], board=[];
+let turn="player", pendingTileIndex=null;
+
+function goHome(){
+  if(window.parent && window.parent !== window){
+    window.parent.scrollTo({top:0,behavior:"smooth"});
+  }else{
+    location.href="index.html";
+  }
+}
+function makeSet(){
+  const arr=[];
+  for(let a=0;a<=6;a++){
+    for(let b=a;b<=6;b++) arr.push({a,b,id:`${a}-${b}-${Math.random()}`});
+  }
+  return shuffle(arr);
+}
+function shuffle(arr){
+  for(let i=arr.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [arr[i],arr[j]]=[arr[j],arr[i]];
+  }
+  return arr;
+}
+function pips(t){return t.a+t.b}
+function handPips(h){return h.reduce((s,t)=>s+pips(t),0)}
+function newRound(){
+  const set=makeSet();
+  player=set.splice(0,7);
+  cpu=set.splice(0,7);
+  boneyard=set;
+  board=[];
+  turn="player";
+  msg("ابدأ اللعب باختيار أي حجر.");
+  render();
+}
+function pipHTML(n){
+  const layouts={0:[],1:[5],2:[1,9],3:[1,5,9],4:[1,3,7,9],5:[1,3,5,7,9],6:[1,3,4,6,7,9]};
+  let html="";
+  for(let i=1;i<=9;i++) html+=`<span class="pip ${layouts[n].includes(i)?"on":""}"></span>`;
+  return html;
+}
+function tileHTML(t, cls=""){
+  const vertical = t.a===t.b ? " vertical" : "";
+  return `<div class="domino ${cls}${vertical}" data-id="${t.id}">
+    <div class="half">${pipHTML(t.a)}</div><div class="half">${pipHTML(t.b)}</div>
+  </div>`;
+}
+function render(){
+  document.getElementById("boneyardCount").textContent=boneyard.length;
+  document.getElementById("playerCount").textContent=player.length;
+  document.getElementById("cpuCount").textContent=cpu.length;
+  document.getElementById("playerPips").textContent=handPips(player);
+  document.getElementById("cpuPips").textContent=handPips(cpu);
+  document.getElementById("ends").textContent=board.length? `${board[0].a} / ${board[board.length-1].b}`:"-";
+  document.getElementById("drawBtn").disabled = turn!=="player" || boneyard.length===0;
+
+  document.getElementById("cpuHand").innerHTML=cpu.map(()=>`<div class="hiddenTile"></div>`).join("");
+
+  const chain=document.getElementById("chain");
+  chain.innerHTML=board.length?board.map(t=>tileHTML(t)).join(""):`<div class="empty">الطاولة فارغة — العب أول حجر</div>`;
+
+  const playable=legalMoves(player);
+  const hand=document.getElementById("playerHand");
+  hand.innerHTML=player.map((t,i)=>tileHTML(t,(playable.includes(i)||board.length===0)?"playable":"")).join("");
+  [...hand.querySelectorAll(".domino")].forEach((el,i)=>el.onclick=()=>playerClick(i));
+}
+function legalMoves(hand){
+  if(board.length===0) return hand.map((_,i)=>i);
+  const left=board[0].a, right=board[board.length-1].b;
+  const res=[];
+  hand.forEach((t,i)=>{ if(t.a===left||t.b===left||t.a===right||t.b===right) res.push(i); });
+  return res;
+}
+function canPlayTile(t){
+  if(board.length===0) return ["start"];
+  const left=board[0].a, right=board[board.length-1].b;
+  const moves=[];
+  if(t.a===left||t.b===left) moves.push("left");
+  if(t.a===right||t.b===right) moves.push("right");
+  return moves;
+}
+function orientForSide(t, side){
+  if(board.length===0) return {a:t.a,b:t.b};
+  if(side==="left"){
+    const left=board[0].a;
+    return t.b===left ? {a:t.a,b:t.b} : {a:t.b,b:t.a};
+  }
+  const right=board[board.length-1].b;
+  return t.a===right ? {a:t.a,b:t.b} : {a:t.b,b:t.a};
+}
+function playerClick(i){
+  if(turn!=="player") return;
+  const t=player[i], moves=canPlayTile(t);
+  if(moves.length===0){ msg("الحجر ده مش مناسب للطرفين."); return; }
+  if(moves[0]==="start" || moves.length===1){
+    playPlayer(i, moves[0]==="start"?"right":moves[0]);
+  }else{
+    pendingTileIndex=i;
+    document.getElementById("choiceTile").innerHTML=tileHTML(t);
+    document.getElementById("leftChoice").onclick=()=>{closeModal();playPlayer(pendingTileIndex,"left")};
+    document.getElementById("rightChoice").onclick=()=>{closeModal();playPlayer(pendingTileIndex,"right")};
+    document.getElementById("sideModal").style.display="grid";
+  }
+}
+function closeModal(){document.getElementById("sideModal").style.display="none";}
+function playPlayer(i, side){
+  const t=player.splice(i,1)[0];
+  const o=orientForSide(t,side);
+  if(board.length===0 || side==="right") board.push(o); else board.unshift(o);
+  msg("حركة جميلة. الكمبيوتر يفكر الآن...");
+  render();
+  if(checkEnd()) return;
+  turn="cpu";
+  setTimeout(cpuTurn,650);
+}
+function drawForPlayer(){
+  if(turn!=="player") return;
+  if(boneyard.length===0){ msg("البنك فاضي. مرّر الدور."); return; }
+  player.push(boneyard.pop());
+  msg("سحبت حجرًا من البنك.");
+  render();
+}
+function passTurn(){
+  if(turn!=="player") return;
+  if(legalMoves(player).length>0){ msg("عندك حجر مناسب، لا يمكنك التمرير."); return; }
+  msg("مرّرت الدور. الكمبيوتر يلعب...");
+  turn="cpu";
+  render();
+  setTimeout(cpuTurn,650);
+}
+function cpuTurn(){
+  let moves=legalMoves(cpu);
+  while(moves.length===0 && boneyard.length>0){
+    cpu.push(boneyard.pop());
+    moves=legalMoves(cpu);
+  }
+  if(moves.length===0){
+    msg("الكمبيوتر مرّر الدور. دورك الآن.");
+    turn="player"; render(); checkBlocked(); return;
+  }
+  const best=moves.map(i=>({i,score:pips(cpu[i])+(cpu[i].a===cpu[i].b?3:0)})).sort((x,y)=>y.score-x.score)[0].i;
+  const t=cpu[best];
+  const sides=canPlayTile(t).filter(x=>x!=="start");
+  const side=sides.length===2?(Math.random()<.5?"left":"right"):(sides[0]||"right");
+  cpu.splice(best,1);
+  const o=orientForSide(t,side);
+  if(board.length===0 || side==="right") board.push(o); else board.unshift(o);
+  msg("الكمبيوتر لعب حجرًا. دورك الآن.");
+  turn="player";
+  render();
+  checkEnd();
+}
+function checkEnd(){
+  if(player.length===0){ msg("🎉 فزت! خلّصت حجارتك قبل الكمبيوتر."); turn="done"; render(); return true; }
+  if(cpu.length===0){ msg("🤖 الكمبيوتر فاز هذه الجولة. جرّب مرة أخرى."); turn="done"; render(); return true; }
+  checkBlocked();
+  return turn==="done";
+}
+function checkBlocked(){
+  if(board.length===0) return;
+  const noMoves=legalMoves(player).length===0 && legalMoves(cpu).length===0 && boneyard.length===0;
+  if(noMoves){
+    const pp=handPips(player), cp=handPips(cpu);
+    if(pp<cp) msg(`🔒 اللعبة اتقفلت — فزت بالأقل نقاطًا: ${pp} مقابل ${cp}.`);
+    else if(cp<pp) msg(`🔒 اللعبة اتقفلت — الكمبيوتر فاز: ${cp} مقابل ${pp}.`);
+    else msg(`🔒 تعادل! كلاكما لديه ${pp} نقطة.`);
+    turn="done"; render();
+  }
+}
+function msg(text){document.getElementById("message").textContent=text;}
+newRound();
+
+
+/* ===== QKPlay customization: Quran Radio Egypt only ===== */
+const QK_QURAN_EGYPT_ONLY = {
+  id: "quran-egypt",
+  country: "مصر",
+  flag: "🇪🇬",
+  name: "إذاعة القرآن الكريم مصر",
+  title: "إذاعة القرآن الكريم مصر",
+  label: "إذاعة القرآن الكريم مصر",
+  sub: "Quran Radio Egypt",
+  url: "https://stream.radiojar.com/8s5u5tpdtwzuv",
+  stream: "https://stream.radiojar.com/8s5u5tpdtwzuv",
+  icon: "📻"
+};
+
+function qkForceQuranEgyptOnly(){
+  const audio = document.getElementById("ap-audio");
+  const title = document.getElementById("ap-title");
+  const sub = document.getElementById("ap-sub");
+  const label = document.getElementById("ap-stream-label");
+  const icon = document.getElementById("ap-icon");
+  const countries = document.getElementById("radio-countries");
+  const fileList = document.getElementById("rs-file-list");
+
+  if(title) title.textContent = "إذاعة القرآن الكريم مصر";
+  if(sub) sub.textContent = "Quran Radio Egypt";
+  if(label) label.textContent = "مصر";
+  if(icon) icon.textContent = "📻";
+
+  if(countries){
+    countries.innerHTML = `
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px">
+        <button id="qk-quran-egypt-station" style="background:var(--surface2);border:1px solid var(--gold);border-radius:12px;padding:14px;color:var(--text);font-family:inherit;cursor:pointer;text-align:center">
+          <div style="font-size:1.8rem;margin-bottom:6px">🇪🇬 📻</div>
+          <div style="font-weight:900;color:var(--gold2)">إذاعة القرآن الكريم مصر</div>
+          <div style="font-size:.7rem;color:var(--text3);margin-top:4px">Quran Radio Egypt</div>
+        </button>
+      </div>
+    `;
+    const btn = document.getElementById("qk-quran-egypt-station");
+    if(btn){
+      btn.onclick = () => {
+        if(audio){
+          audio.src = QK_QURAN_EGYPT_ONLY.url;
+          audio.play().catch(()=>{});
+        }
+        const selector = document.getElementById("radio-selector");
+        if(selector) selector.style.display = "none";
+        if(title) title.textContent = "إذاعة القرآن الكريم مصر";
+        if(sub) sub.textContent = "Quran Radio Egypt";
+        if(label) label.textContent = "مصر";
+      };
+    }
+  }
+
+  if(fileList) fileList.innerHTML = "";
+}
+
+window.addEventListener("DOMContentLoaded", qkForceQuranEgyptOnly);
+setTimeout(qkForceQuranEgyptOnly, 700);
+
+const qkPlayButton = document.getElementById("ap-play");
+if(qkPlayButton){
+  qkPlayButton.addEventListener("click", () => {
+    const audio = document.getElementById("ap-audio");
+    if(audio && !audio.src){
+      audio.src = QK_QURAN_EGYPT_ONLY.url;
+    }
+  }, true);
+}
+
+</script>
+</body>
+</html>
