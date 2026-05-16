@@ -463,6 +463,51 @@
 }
 </style>
 
+
+<style>
+/* QKPlay professional fixes */
+.gameOverlayTop{
+  background:linear-gradient(135deg,rgba(10,14,28,.96),rgba(18,26,47,.94))!important;
+  border-bottom:1px solid rgba(255,209,102,.18)!important;
+  box-shadow:0 8px 24px rgba(0,0,0,.25)!important;
+}
+.gameOverlayTitle{
+  color:#f7f7fb!important;
+  letter-spacing:.3px!important;
+  font-weight:950!important;
+}
+.closeGameBtn{
+  background:linear-gradient(135deg,#fff,#ffd166)!important;
+  color:#08111e!important;
+  border-radius:14px!important;
+  padding:10px 15px!important;
+}
+.qk-radio-bar{
+  max-width:1180px;
+  margin:auto;
+  left:50%!important;
+  right:auto!important;
+  transform:translateX(-50%);
+  width:calc(100% - 28px);
+  background:linear-gradient(135deg,rgba(20,9,18,.96),rgba(9,12,24,.97))!important;
+  border:1px solid rgba(255,209,102,.25)!important;
+}
+.qk-radio-title{
+  font-size:13px!important;
+}
+.qk-radio-sub{
+  font-size:10.5px!important;
+}
+.qk-radio-status{
+  min-width:54px!important;
+}
+@media(max-width:650px){
+  .qk-radio-bar{
+    width:calc(100% - 16px);
+  }
+}
+</style>
+
 </head>
 <body>
   <div class="wrap">
@@ -640,8 +685,8 @@
 
 <div class="gameOverlay" id="gameOverlay">
   <div class="gameOverlayTop">
-    <div class="gameOverlayTitle">🎲 Domino Duel</div>
-    <button class="closeGameBtn" onclick="closeGame()">إغلاق اللعبة</button>
+    <div class="gameOverlayTitle">🎮 QKPlay Arcade</div>
+    <button class="closeGameBtn" onclick="closeGame()">العودة للمنصة</button>
   </div>
   <iframe id="gameFrame" src=""></iframe>
 </div>
@@ -671,8 +716,8 @@ body{padding-bottom:74px!important}
 <div class="qk-radio-bar" id="qkRadioBar">
   <div class="qk-radio-logo">📻</div>
   <div class="qk-radio-info">
-    <div class="qk-radio-title">إذاعة القرآن الكريم مصر</div>
-    <div class="qk-radio-sub">تعمل في كل صفحات وألعاب QKPlay Arcade</div>
+    <div class="qk-radio-title">📻 إذاعة القرآن الكريم من القاهرة</div>
+    <div class="qk-radio-sub">استمع أثناء التصفح واللعب داخل المنصة</div>
   </div>
   <div class="qk-radio-controls">
     <button class="qk-radio-btn" id="qkRadioPlay">▶</button>
