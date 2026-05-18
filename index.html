@@ -1,29 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>QKPlay Arcade</title>
+
+<style>
+:root{
+  --bg:#070914;
+  --bg2:#10172a;
+  --panel:#121a2f;
+  --panel2:#17233d;
+  --qatar:#8a1538;
+  --gold:#ffd166;
+  --cyan:#36d1dc;
+  --green:#54e38e;
+  --text:#f7f7fb;
+  --muted:#aeb7cf;
+  --line:rgba(255,255,255,.1);
+}
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+body{
+  font-family:Tahoma,Arial,sans-serif;
+  color:var(--text);
+  min-height:100vh;
+
+  background:
+    radial-gradient(circle at top left, rgba(138,21,56,.4), transparent 30%),
+    radial-gradient(circle at top right, rgba(54,209,220,.18), transparent 25%),
+    linear-gradient(135deg,var(--bg),var(--bg2));
+
+  overflow-x:hidden;
+}
+
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+
+  background-image:
+    linear-gradient(rgba(255,255,255,.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px);
+
+  background-size:40px 40px;
+}
+
+.container{
+  width:min(1200px,94%);
+  margin:auto;
+  padding:30px 0 120px;
+  position:relative;
+  z-index:2;
+}
+
+.topbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:20px;
+
+  padding:16px 22px;
+
+  border:1px solid var(--line);
+
+  border-radius:24px;
+
+  background:rgba(255,255,255,.06);
+
+  backdrop-filter:blur(16px);
+
+  margin-bottom:35px;
+}
+
+.logoWrap{
+  display:flex;
+  align-items:center;
+  gap:14px;
+}
+
+.logo{
+  width:54px;
+  height:54px;
+  border-radius:18px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  font-size:26px;
+  font-weight:bold;
+
+  background:linear-gradient(135deg,var(--qatar),#3a0818);
+}
+
+.logoText{
+  font-size:28px;
+  font-weight:900;
+}
+
+.nav{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+.nav a{
+  text-decoration:none;
+  color:white;
+
+  padding:10px 16px;
+
+  border-radius:16px;
+
+  background:rgba(255,255,255,.08);
+
+  border:1px solid var(--line);
+}
+
+.hero{
+  margin-bottom:40px;
+}
+
+.hero h1{
+  font-size:52px;
+  margin-bottom:14px;
+}
+
+.hero p{
+  color:var(--muted);
+  max-width:700px;
+  line-height:1.8;
+  font-size:18px;
+}
+
+.gamesTitle{
+  font-size:40px;
+  margin-bottom:25px;
+  font-weight:900;
+}
+
+.gamesGrid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+  gap:24px;
+}
+
+.gameCard{
+  border-radius:28px;
+
+  overflow:hidden;
+
+  border:1px solid var(--line);
+
+  background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+
+  box-shadow:0 20px 50px rgba(0,0,0,.25);
+
+  transition:.2s;
+}
+
+.gameCard:hover{
+  transform:translateY(-5px);
+}
+
+.cover{
+  height:220px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  font-size:90px;
+
+  background:
+    radial-gradient(circle at center, rgba(84,227,142,.3), transparent 45%),
+    linear-gradient(135deg,#0d4738,#08291f);
+}
+
+.gameBody{
+  padding:22px;
+}
+
+.gameTitle{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+
+  margin-bottom:14px;
+}
+
+.gameTitle h3{
+  font-size:30px;
+}
+
+.tag{
+  background:rgba(84,227,142,.18);
+  color:#9ff4c4;
+
+  padding:8px 14px;
+
+  border-radius:999px;
+
+  font-size:13px;
+  font-weight:900;
+}
+
+.desc{
+  color:var(--muted);
+
+  line-height:1.8;
+
+  margin-bottom:18px;
+}
+
+.meta{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+
+  margin-bottom:20px;
+}
+
+.meta span{
+  padding:8px 12px;
+
+  border-radius:14px;
+
+  background:rgba(255,255,255,.07);
+
+  border:1px solid var(--line);
+
+  font-size:13px;
+}
+
+.playRow{
+  display:flex;
+}
+
+.btn{
+  width:100%;
+
+  border:none;
+
+  padding:16px;
+
+  border-radius:18px;
+
+  font-size:18px;
+  font-weight:900;
+
+  cursor:pointer;
+
+  color:#08111e;
+
+  background:linear-gradient(135deg,#fff,var(--gold));
+
+  transition:.2s;
+}
+
+.btn:hover{
+  transform:scale(1.02);
+}
+
+.radioBar{
+  position:fixed;
+
+  left:50%;
+  transform:translateX(-50%);
+
+  bottom:14px;
+
+  width:min(1000px,95%);
+
+  padding:14px 20px;
+
+  border-radius:22px;
+
+  background:rgba(0,0,0,.75);
+
+  border:1px solid rgba(255,255,255,.12);
+
+  backdrop-filter:blur(18px);
+
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:20px;
+
+  z-index:999;
+}
+
+.radioInfo{
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+}
+
+.radioInfo strong{
+  color:#fff;
+}
+
+.radioInfo span{
+  color:#ccc;
+  font-size:14px;
+}
+
+.controls{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.playBtn{
+  width:54px;
+  height:54px;
+
+  border-radius:50%;
+  border:none;
+
+  cursor:pointer;
+
+  font-size:20px;
+  font-weight:bold;
+
+  background:linear-gradient(135deg,#fff,var(--gold));
+}
+
+.castBtn{
+  border:none;
+
+  background:rgba(255,255,255,.1);
+
+  color:white;
+
+  padding:10px 16px;
+
+  border-radius:14px;
+
+  cursor:pointer;
+}
+
+.volume{
+  width:140px;
+}
+
+@media(max-width:768px){
+
+  .hero h1{
+    font-size:38px;
+  }
+
+  .topbar{
+    flex-direction:column;
+    text-align:center;
+  }
+
+  .logoWrap{
+    justify-content:center;
+  }
+
+  .nav{
+    justify-content:center;
+  }
+
+  .radioBar{
+    flex-direction:column;
+    align-items:stretch;
+  }
+
+  .controls{
+    justify-content:center;
+  }
+
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<header class="topbar">
+
+<div class="logoWrap">
+<div class="logo">🎮</div>
+<div class="logoText">QKPlay Arcade</div>
+</div>
+
+<nav class="nav">
+<a href="#">Games</a>
+<a href="#">Game of the Day</a>
+<a href="#">About</a>
+</nav>
+
+</header>
+
+<section class="hero">
+
+<h1>Welcome to QKPlay Arcade</h1>
+
+<p>
+A modern browser arcade with retro classroom vibes.
+Play classic games directly inside your browser with smooth animations and mobile support.
+</p>
+
+</section>
+
+<h2 class="gamesTitle">Game of the Day</h2>
+
+<section class="gamesGrid">
+
+<!-- DOMINO -->
+
 <article class="gameCard">
-  <div class="cover">🐍</div>
 
-  <div class="gameBody">
+<div class="cover">🁣</div>
 
-    <div class="gameTitle">
-      <h3>Snake Retro</h3>
-      <span class="tag">Live</span>
-    </div>
+<div class="gameBody">
 
-    <p class="desc">
-      Classic snake game with speed levels and a classroom leaderboard idea.
-    </p>
+<div class="gameTitle">
+<h3>Domino Duel</h3>
+<span class="tag">Live</span>
+</div>
 
-    <div class="meta">
-      <span>⚡ Reflex</span>
-      <span>⏱ 3 min</span>
-      <span>⭐ Easy</span>
-    </div>
+<p class="desc">
+A polished domino game against the computer.
+</p>
 
-    <div class="playRow">
-      <button class="btn"
-        onclick="location.href='snake.html'">
-        Play Game
-      </button>
-    </div>
+<div class="meta">
+<span>🧠 Strategy</span>
+<span>⏱ 5 min</span>
+<span>⭐ Medium</span>
+</div>
 
-  </div>
+<div class="playRow">
+<button class="btn"
+onclick="location.href='domino.html'">
+Play Game
+</button>
+</div>
+
+</div>
+
 </article>
+
+<!-- SNAKE -->
+
+<article class="gameCard">
+
+<div class="cover">🐍</div>
+
+<div class="gameBody">
+
+<div class="gameTitle">
+<h3>Snake Retro</h3>
+<span class="tag">Live</span>
+</div>
+
+<p class="desc">
+Classic snake game with retro visuals and speed levels.
+</p>
+
+<div class="meta">
+<span>⚡ Reflex</span>
+<span>⏱ 3 min</span>
+<span>⭐ Easy</span>
+</div>
+
+<div class="playRow">
+<button class="btn"
+onclick="location.href='snake.html'">
+Play Game
+</button>
+</div>
+
+</div>
+
+</article>
+
+<!-- MEMORY -->
+
+<article class="gameCard">
+
+<div class="cover">🧠</div>
+
+<div class="gameBody">
+
+<div class="gameTitle">
+<h3>Memory Cards</h3>
+<span class="tag">Soon</span>
+</div>
+
+<p class="desc">
+Flip cards, match pairs, and train your memory.
+</p>
+
+<div class="meta">
+<span>🧩 Puzzle</span>
+<span>⏱ 4 min</span>
+<span>⭐ Easy</span>
+</div>
+
+<div class="playRow">
+<button class="btn">
+Coming Soon
+</button>
+</div>
+
+</div>
+
+</article>
+
+</section>
+
+</div>
+
+<!-- RADIO -->
+
+<div class="radioBar">
+
+<div class="radioInfo">
+<strong>إذاعة القرآن الكريم من القاهرة</strong>
+<span>البث المباشر</span>
+</div>
+
+<div class="controls">
+
+<button class="playBtn" id="playBtn">
+▶
+</button>
+
+<button class="castBtn">
+📺 Cast
+</button>
+
+<input type="range"
+class="volume"
+id="volume"
+min="0"
+max="1"
+step="0.01"
+value="0.7">
+
+</div>
+
+</div>
+
+<audio id="radio"
+src="https://n0c.radiojar.com/8s5u5tpdtwzuv?rj-ttl=5&rj-tok=AAABl"
+preload="none">
+</audio>
+
+<script>
+
+const radio=document.getElementById("radio");
+const playBtn=document.getElementById("playBtn");
+const volume=document.getElementById("volume");
+
+radio.volume=.7;
+
+playBtn.onclick=()=>{
+
+if(radio.paused){
+  radio.play();
+  playBtn.innerHTML="⏸";
+}else{
+  radio.pause();
+  playBtn.innerHTML="▶";
+}
+
+};
+
+volume.oninput=()=>{
+radio.volume=volume.value;
+};
+
+</script>
+
+</body>
+</html>
